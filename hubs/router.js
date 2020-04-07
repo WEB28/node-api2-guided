@@ -6,7 +6,7 @@ const router = express.Router();
 
 //handles every request begins with /api/hubs/
 
-router.get('/api/hubs', (req, res) => {
+router.get('/', (req, res) => {
     Hubs.find(req.query)
     .then(hubs => {
       res.status(200).json(hubs);
@@ -20,7 +20,7 @@ router.get('/api/hubs', (req, res) => {
     });
 });
 
-router.get('/api/hubs/:id', (req, res) => {
+router.get('/:id', (req, res) => {
 Hubs.findById(req.params.id)
 .then(hub => {
     if (hub) {
@@ -38,7 +38,7 @@ Hubs.findById(req.params.id)
 });
 });
 
-router.post('/api/hubs', (req, res) => {
+router.post('/', (req, res) => {
 Hubs.add(req.body)
 .then(hub => {
     res.status(201).json(hub);
@@ -52,7 +52,7 @@ Hubs.add(req.body)
 });
 });
 
-router.delete('/api/hubs/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
 const id = req.params.id;
 
 Hubs.remove(id)
@@ -72,7 +72,7 @@ Hubs.remove(id)
     })
 });
 
-router.put('/api/hubs/:id', (req, res) => {
+router.put('/:id', (req, res) => {
 const changes = req.body;
 
 console.log('changes:', changes);
@@ -102,7 +102,33 @@ Hubs.update(req.params.id, changes)
 });
 
 // add an endpoint that returns all the messages for a hub
+// /api/hubs/:id/messages
+
+router.get('/:id/messages', (req, res) => {
+    const { id } = req.params
+    
+    Hubs.findHubMessages(id)
+        .then(messages => {
+            res.status(200).json(messages)
+        })
+        .catch(err => {
+            res.status(500).json({ errorMessage: "error reading messages"})
+        })
+} )
+
 // add an endpoint for adding new message to a hub
+router.post('/:id/messages', (req, res) => {
+    // const { id } = req.params;
+    const newMessage = req.body;
+
+    Hubs.addMessage(newMessage)
+        .then((message) => {
+            res.status(201).json(message);
+        })
+        .catch(err => {
+            res.status(500).json({ errorMessage: 'error adding a message'})
+        })
+})
 
 module.exports = router; // make it available for require()
 
